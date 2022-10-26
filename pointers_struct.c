@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+
 
 /*
 un jeu video avec les jouerus mario et luigi avec fonction pour remplir tout les champs de mario et luigi. 
@@ -7,34 +9,62 @@ mario et luigi sont aussi stocké dans un tableau
 
 struct Date
 {
-    int jour;
-    int mois;
-    int annee;
+    int day;
+    int month;
+    int year;
 };
 
-struct Joueur
+struct Player
 {
-    char nom[10];
-    int vie;
-    float taille;
-    struct Date annif;
+    char name[10];
+    int lifes;
+    float height;
+    struct Date birthday;
 };
 
+void Fill_data(struct Player * in)
+{
+    printf("\nGive the name of player:");
+    scanf("%s",in->name);
+
+    printf("\nGive the # of lifes:");
+    scanf("%d",&in->lifes);
+
+    printf("\nGive the height:");
+    scanf("%d",&in->height);
+
+    printf("\nGive the birthdate (dd mm yyyy)");
+
+    scanf("%d",&in->birthday.day);
+    scanf("%d",&in->birthday.month);
+    scanf("%d",&in->birthday.year);
+}
+
+void Show_Data(struct Player * in)
+{
+    printf("______________________________\n");
+    printf("Showing data from %s\n",in->name);
+    printf("------------------------------\n");
+    printf("lifes: %d \n",          in->lifes);
+    printf("Height: %d \n",         in->height);
+    printf("Birthdate: %d/%d/%d \n",in->birthday.day,in->birthday.month,in->birthday.year);
+}
 
 
 int main()
 {
-    struct Joueur italiens[2];
-    printf("\n");
-    struct Joueur mario;
-    mario.vie = 3;
+    int player_count = 2;
+    struct Player players[player_count];
 
-    struct Joueur *p;
-    
-    p = &mario;
-    p -> annif.annee = 2022; // (*p).annif.annee = 6;
+    for (int i = 0; i< player_count; i++)
+        Fill_data(&players[i]);
 
-    printf("année: %d \n",p->annif.annee);
+    for (int j=0;j<player_count;j++)
+        Show_Data(&players[j]);
+
+
+
+
 
     return 0;
 }
