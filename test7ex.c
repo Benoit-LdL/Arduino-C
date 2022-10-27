@@ -125,7 +125,7 @@ void ex6()
     for (int j=0;j<nombre_clients;j++)
         total += (clients[j].boissons * price_drink) + (clients[j].sandwichs * price_food);
 
-    printf("Chiffre d'affaire total: %d",total);
+    printf("\n--> Chiffre d'affaire total: %d\n",total);
 
 }
 
@@ -154,7 +154,7 @@ int main()
     // char phrase[] = "Hallo ik ben aan het drinken maar bob niet.0";
     // printf("Nombre de 'A' dans la pharse: %d",ex5(phrase));
 
-    // ex6();
+    ex6();
 
-    ex7();
+    // ex7();
 }
