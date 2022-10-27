@@ -1,9 +1,36 @@
+/*
+    \file       test7ex.c
+    \author     Benoît Lagasse
+    \date       27/10/2022
+    \brief      Une petite description
+    \details    Plus de detail sur le programme
+    \version    1.0
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 
 #define EXERCICE 1
+
+/* 
+    \name       test
+    \author     Benoît Lagasse
+    \date       27/10/2022
+    \brief      test func for custom comments
+    \details    ex giving back addition
+
+    \param a int    : first value to add
+    \param b int    : second value to add
+
+    \return int     : int result of addition
+*/
+int test(int a, int b)
+{
+    return a+b;
+}
 
 
 void ex1()
