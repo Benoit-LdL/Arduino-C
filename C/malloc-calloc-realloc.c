@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 /*
-    MALLOC      allocztes mem + doesn't touch values inside bytes
-    CALLOC      allocates mem + sets all bytes to 0
+    MALLOC      alloczte mem + doesn't touch values inside bytes
+    CALLOC      allocate mem + sets all bytes to 0
     REALLOC     resize variable
     FREE        free up memory
 */
