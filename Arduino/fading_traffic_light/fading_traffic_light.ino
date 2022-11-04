@@ -2,6 +2,9 @@ const int led_red     = 32;
 const int led_yellow  = 33;
 const int led_green   = 25;
 
+const int iteration_speed   = 2;
+const int main_delay        = 2000;
+
 void setup() {
 
   Serial.begin(115200);
@@ -13,20 +16,24 @@ void setup() {
 
 void loop() {
   
-  FadeIn(led_green,2);
-  delay(2000);
+  Serial.println("DING!");
+  FadeIn(led_green,iteration_speed);
+  delay(main_delay);
 
   Serial.println("Attention!");
 
-  FadeOut(led_green,2);
-  FadeIn(led_yellow,2);
-  delay(200);
+  FadeOut(led_green,iteration_speed);
+  FadeIn(led_yellow,iteration_speed);
+  delay(main_delay/10);
 
-  FadeOut(led_yellow,2);
-  FadeIn(led_red,2);
-  delay(2000);
+  FadeOut(led_yellow,iteration_speed);
 
-  FadeOut(led_red,2);
+  Serial.println("DONG!");
+  Serial.println("___________");
+  FadeIn(led_red,iteration_speed);
+  delay(main_delay);
+
+  FadeOut(led_red,iteration_speed);
 }
 
 void FadeIn(int pin_number, int delay_ms)
