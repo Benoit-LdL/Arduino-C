@@ -7,31 +7,31 @@
 #define ODOM_STEP_MM      2.5 //PERIMETRE_ROUE / ODOM_SECTIONS
 
 // Motors
-#define MOTOR_RIGHT_IN1   32
-#define MOTOR_RIGHT_IN2   33
-#define MOTOR_LEFT_IN3    25
-#define MOTOR_LEFT_IN4    26
+#define MOTOR_RIGHT_IN1   16
+#define MOTOR_RIGHT_IN2   17
+#define MOTOR_LEFT_IN3    18
+#define MOTOR_LEFT_IN4    19
 
 // IR Sensors
-#define IR_LEFT           27
-#define IR_RIGHT          35
+#define IR_LEFT           15
 
 // ODOM
-#define ODOM_LEFT         12
-#define ODOM_RIGHT        13
+#define ODOM_LEFT         2
+#define ODOM_RIGHT        4
 
-int IR_left_value         = 0; // Boolean?
-int IR_right_value        = 0;
+int IR_left_value         = 0;
 
 int odom_left_counter     = 0;
 int odom_right_counter    = 0;
 
-int state                 = 2;
+int state                 = 0;
 
-int input_distance        = 1000; // in mm
+int distance1             = 2000; // in mm
+int distance2             = 500; // in mm
 
-void setup()
-{
+int start_rotation;
+
+void setup() {
   Serial.begin(115200);
 
   pinMode(MOTOR_RIGHT_IN1,  OUTPUT);
@@ -40,84 +40,91 @@ void setup()
   pinMode(MOTOR_LEFT_IN4,   OUTPUT);
 
   attachInterrupt(IR_LEFT,    Read_IR_left,     CHANGE);
-  attachInterrupt(IR_RIGHT,   Read_IR_right,    CHANGE);
 
   attachInterrupt(ODOM_LEFT,  Read_odom_left,   CHANGE);
   attachInterrupt(ODOM_RIGHT, Read_odom_right,  CHANGE);
 
+  //#######
+  //  1
+  //#######
   // Reset counters to avoid unexpected triggers after initialisation
-  delay(1000);
+  delay(2000);
+
   odom_left_counter   = 0;
   odom_right_counter  = 0;
-
 }
 
-void loop()
-{
+
+void loop() {
   /*
+  Drive_forwards();
   Serial.println("------DEBUG-------");
-  Serial.print("left:");            Serial.println(IR_left_value);                   Serial.print("right:"); Serial.println(IR_right_value);
+  Serial.print("left:");            Serial.println(IR_left_value);
   
   Serial.print("odom step:  ");     Serial.println(ODOM_STEP_MM);
   Serial.print("odom counter: ");   Serial.println(odom_left_counter);
-  Serial.print("odom L en mm: ");   Serial.println(odom_right_counter*ODOM_STEP_MM);
+  Serial.print("odom L en mm: ");   Serial.println(odom_left_counter*ODOM_STEP_MM);
 
   delay(100);
   */
-  
+
+
   // /*
   switch(state)
-  {
-    case 0:
-      Serial.println("driving left");
-
+  {  
+    case 0: // Drive left
+      Serial.println("Drive left");
       Drive_left();
 
-      if (  IR_right_value  && !IR_left_value   ){state = 1;}
-      if (  !IR_right_value && !IR_left_value   ){state = 2;}
-      if (  IR_right_value  && IR_left_value    ){state = 2;}
-      if (  odom_left_counter >= input_distance / ODOM_STEP_MM){state = 3;}
+      if (  IR_left_value ){state = 1;}
+      if (  odom_left_counter >= distance1 / ODOM_STEP_MM){state = 2;}  // if distance >= stop 1
+      break;
+
+
+    case 1: // Drive right
+      Serial.println("Drive right");
+      Drive_right();
+      
+      if (  !IR_left_value ){state = 0;}
+      if (  odom_left_counter >= distance1 / ODOM_STEP_MM ){state = 2;}  // if distance >= stop 1
       break;
     
-    case 1:
-      Serial.println("driving right");
-
-      Drive_right();
-
-      if (  IR_left_value   && !IR_right_value  ){state = 0;}
-      if (  !IR_right_value && !IR_left_value   ){state = 2;}
-      if (  IR_right_value  && IR_left_value    ){state = 2;}
-      if (  odom_left_counter >= input_distance / ODOM_STEP_MM){state = 3;}
-      break;
-
-    case 2:
-      Serial.println("driving forwards");
-
-      Drive_forwards();
-
-      if (  IR_left_value   && !IR_right_value  ){state = 0;}
-      if (  IR_right_value  && !IR_left_value   ){state = 1;}
-      if (  odom_left_counter >= input_distance / ODOM_STEP_MM){state = 3;}
-      break;
-
-    case 3:
-      Serial.println("stopping.");
+    case 2: // rotate 180 deg
+      Drive_stop();
+      Serial.println("Rotate");
+      //#######
+      //  4
+      //#######
+      delay(1000);
       
+      //#######
+      //  5
+      //#######
+      start_rotation = odom_left_counter;
+
+
+      Rotate();
+      delay(600);
+      // while (odom_left_counter-start_rotation < ODOM_SECTIONS/2) // rotate half a turn
+      // {
+      // }
+      Drive_stop();
+      odom_left_counter = 0;
+      state = 0;
+      break;
+
+    case 3: // stop
+      Serial.println("Stop");
       Drive_stop();
       break;
-
   }
   // */
+
 }
 
 ICACHE_RAM_ATTR void Read_IR_left()
 {
   IR_left_value = digitalRead(IR_LEFT);
-}
-
-ICACHE_RAM_ATTR void Read_IR_right()
-{
-  IR_right_value = digitalRead(IR_RIGHT);
 }
 
 ICACHE_RAM_ATTR void Read_odom_left()
@@ -129,10 +136,6 @@ ICACHE_RAM_ATTR void Read_odom_right()
 {
   odom_right_counter++;
 }
-
-
-
-
 
 void Motor_right(int direction){
   if (direction == 1)
@@ -179,8 +182,8 @@ void Motor_left(int direction){
 }
 
 void Drive_forwards(){
-  Motor_right(1);
-  Motor_left(1);
+  Motor_right(-1);
+  Motor_left(-1);
 }
 
 void Drive_backwards(){
@@ -190,12 +193,17 @@ void Drive_backwards(){
 
 void Drive_right(){
   Motor_right(0);
-  Motor_left(1);
+  Motor_left(-1);
 }
 
 void Drive_left(){
-  Motor_right(1);
+  Motor_right(-1);
   Motor_left(0);
+}
+
+void Rotate(){
+  Motor_right(1);
+  Motor_left(-1);
 }
 
 void Drive_stop(){
